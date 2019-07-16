@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import axios from '../../axios-orders.js'
 import Aux from '../../hoc/Aux.js';
 import Burger from '../../components/Burger/Burger.js';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls.js';
@@ -30,14 +31,26 @@ class BurgerBuilder extends Component {
         this.setState({purchasing: true})
     }
 
-    purchaseCanceledHandler = () => {
-        console.log("purchaseCancelledHandler called")
+    purchaseCancelledHandler = () => {
         this.setState({purchasing: false})
     }
 
     purchaseContinuedHandler = () => {
-        console.log("purchaseContinuedHandler called")
-        alert("You continue!");
+        const order = {
+            ingredients: this.state.ingredients,
+            price: this.state.totalPrice,
+            customer: {
+                street: 'Teststreet 1',
+                zipCode: '06073',
+                country: 'Germany'
+            },
+            email: 'test@test.com',
+            deliveryMethod: 'fastest'
+        }
+        axios.post('/orders.json', order)
+            .then(response => console.log(response))
+            .catch(error => console.log(error));
+
     }
 
     updatePurchaseState(ingredients) {
@@ -95,7 +108,7 @@ class BurgerBuilder extends Component {
                 <Modal show={this.state.purchasing} modalClosed={this.purchaseCanceledHandler}>
                     <OrderSummary 
                         ingredients={this.state.ingredients}
-                        purchaseCanceled={this.purchaseCanceledHandler}
+                        purchaseCancelled={this.purchaseCancelledHandler}
                         purchaseContinued={this.purchaseContinuedHandler}
                         price={this.state.totalPrice}/>
                 </Modal>
